@@ -23,13 +23,39 @@ export function setupLights(scene, renderer) {
   scene.add(spawnLight);
   scene.add(spawnLight.target);
 
-  const dLightHelper1 = new THREE.SpotLightHelper(spawnLight);
-  scene.add(dLightHelper1);
-
   spawnLight.castShadow = true;
   spawnLight.shadow.mapSize.set(2048, 2048);
   spawnLight.shadow.camera.near = 1;
   spawnLight.shadow.camera.far = 30;
 
   return { sceneAmbientLight, light, spawnLight };
+}
+
+export function particles(scene) {
+    const points = [];
+
+    for (let i = 0; i < 2000; i++) {
+    const dir = new THREE.Vector3(
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1
+    ).normalize();
+    points.push(dir.multiplyScalar(80 + Math.random() * 220));
+  }
+
+    const starGeo = new THREE.BufferGeometry().setFromPoints(points);
+
+    let sprite = new THREE.TextureLoader().load("assets/textures/star.png");
+    let starMaterial = new THREE.PointsMaterial({
+        color: 0xffb6c1,
+        sizeAttenuation: false,
+        size: 2,
+        map: sprite,
+    });
+
+
+  const stars = new THREE.Points(starGeo, starMaterial);
+  scene.add(stars);
+
+  return stars;
 }

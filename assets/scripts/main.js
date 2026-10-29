@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { setupLights } from './lightsneffects.js';
+import { setupLights, particles } from './lightsneffects.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -11,7 +11,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild( renderer.domElement );
 
 const controls = new OrbitControls(camera, renderer.domElement);
-camera.position.set(-5, 5, -5);
+camera.position.set(0, 1, 3);
 controls.update();
 
 const textureLoader = new THREE.TextureLoader();
@@ -29,8 +29,10 @@ scene.background = cubeTextureLoader.load(
 );
 
 // -------------------------------------------------------
-const lights = setupLights(scene, renderer);
+setupLights(scene, renderer);
+const stars = particles(scene);
 
+scene.fog = new THREE.Fog(0x2c136b, 4, 15);
 
 // 3D MODELS ----
 const loader = new GLTFLoader();
@@ -102,13 +104,29 @@ const TheSpawnGeo = new THREE.PlaneGeometry(10, 10);
 const TheSpawnMat = new THREE.MeshBasicMaterial({
   map: textureLoader.load('assets/textures/TheSpawn.png'), 
   transparent: true,
-  alphaTest: 0.5,
+  opacity: 0.8,
   side: THREE.DoubleSide
 });
 const TheSpawn = new THREE.Mesh(TheSpawnGeo, TheSpawnMat);
-TheSpawn.position.set(0, 15, -2);
+TheSpawn.position.set(0, 11.5, -2);
 TheSpawn.rotation.x = Math.PI / 2.5;
-scene.add(TheSpawn);
+
+const glowMat = new THREE.MeshBasicMaterial({
+  map: TheSpawnMat.map,
+  color: 0xa070ff,             
+  transparent: true,
+  opacity: 0.2,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  side: THREE.DoubleSide
+});
+
+const TheSpawnGlow = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), glowMat);
+TheSpawnGlow.position.copy(TheSpawn.position);
+TheSpawnGlow.rotation.copy(TheSpawn.rotation);
+TheSpawnGlow.position.y -= 0.05;   
+
+scene.add(TheSpawn, TheSpawnGlow);
 
 
 // FENCE ----
@@ -1686,8 +1704,6 @@ function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 
-  TheSpawn.rotation.z += 0.03;
-
   const t = clock.getElapsedTime();
   const angle = t * walkSpeed;
 
@@ -1697,7 +1713,12 @@ function animate() {
   TwoTimemodel.rotation.y = -angle + twoTimeFacing;
   Azuremodel.rotation.y = -(angle - followGap * Math.sign(walkSpeed)) + azureFacing;
 
-  TheSpawn.rotation.z += 0.02;
+  TheSpawn.rotation.z += 0.01;
+  TheSpawnGlow.rotation.z -= 0.02;
+
+  stars.rotation.y += 0.002;
+  //scene.backgroundRotation.y -= 0.002;
+
   renderer.render(scene, camera);
 
 }
