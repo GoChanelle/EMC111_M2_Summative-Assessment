@@ -34,17 +34,6 @@ const stars = particles(scene);
 
 scene.fog = new THREE.Fog(0x2c136b, 4, 15);
 
-const listener = new THREE.AudioListener();
-camera.add(listener);
-const sound = new THREE.Audio(listener);
-const audioLoader = new THREE.AudioLoader();
-audioLoader.load('assets/audio/AndTheSeraphimWept.mp3', function(buffer) {
-	sound.setBuffer(buffer);
-	sound.setLoop(true);
-	sound.setVolume(0.5);
-	sound.play();
-});
-
 // 3D MODELS ----
 const loader = new GLTFLoader();
 const TwoTime = await loader.loadAsync('assets/2TimeModel/scene.gltf');
@@ -64,6 +53,37 @@ Azuremodel.position.set(0, 0, 1); // <- ORIGINAL POSITION
 Azuremodel.rotation.y = Math.PI / 2;
 Azuremodel.traverse(o => { if (o.isMesh) o.castShadow = true; });
 Azuremodel.scale.set(0.15, 0.15, 0.15);
+
+// AUDIO ----
+const listener = new THREE.AudioListener();
+camera.add(listener);
+const sound = new THREE.Audio(listener);
+
+let audioReady = false;
+
+new THREE.AudioLoader().load('assets/audio/AndTheSeraphimWept.mp3', (buffer) => {
+  sound.setBuffer(buffer);
+  sound.setLoop(true);
+  sound.setVolume(0.5);
+  audioReady = true;
+  tryStart();                      
+});
+
+function tryStart() {
+  if (!audioReady || sound.isPlaying) return;
+
+  if (listener.context.state === 'suspended') {
+    listener.context.resume().then(() => {
+      if (listener.context.state === 'running' && !sound.isPlaying) sound.play();
+    });
+    return;
+  }
+  sound.play();
+}
+
+for (const ev of ['pointerdown', 'click', 'keydown', 'touchstart']) {
+  window.addEventListener(ev, tryStart, { capture: true });
+}
 
 
 // UNIVERSAL MATERIALS ----
@@ -1710,6 +1730,7 @@ function placeOnCircle(model, angle, y) {
 
   model.rotation.y = -angle + (walkSpeed > 0 ? 0 : Math.PI) + modelFacingOffset;
 }
+
 
 function animate() {
   requestAnimationFrame(animate);
