@@ -1,0 +1,11 @@
+Model Information:
+* title:	Azure (FORSAKEN) [OFFICAL]
+* source:	https://sketchfab.com/3d-models/azure-forsaken-offical-66368422b9bb436f9e769aa984aee8f8
+* author:	ForsakenRips (https://sketchfab.com/ForsakenRips)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Azure (FORSAKEN) [OFFICAL]" (https://sketchfab.com/3d-models/azure-forsaken-offical-66368422b9bb436f9e769aa984aee8f8) by ForsakenRips (https://sketchfab.com/ForsakenRips) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

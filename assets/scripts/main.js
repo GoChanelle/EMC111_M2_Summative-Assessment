@@ -21,7 +21,7 @@ scene.background = cubeTextureLoader.load(
         'assets/textures/sky.jpg',
         'assets/textures/sky.jpg',
         'assets/textures/sky.jpg',
-        'assets/textures/skyDarker.jpg',
+        'assets/textures/sky.jpg',
         'assets/textures/sky.jpg',
         'assets/textures/sky.jpg'
     ]
@@ -30,14 +30,14 @@ scene.background = cubeTextureLoader.load(
 // -------------------------------------------------------
 renderer.shadowMap.enabled = true;
 
-const light = new THREE.HemisphereLight(0x4f2c8f, 0x631a47, 1);
-scene.add(light);
-
-const sceneAmbientLight = new THREE.AmbientLight(0x271a52, 0.5);
+const sceneAmbientLight = new THREE.AmbientLight(0x4a0073, 0.9);
 scene.add(sceneAmbientLight);
 
-const spawnLight = new THREE.SpotLight(0xaab8ff, 40);
-spawnLight.position.set(0, 6, -5);                      
+const light = new THREE.HemisphereLight(0x8313eb, 0x250061, 0.8);
+scene.add(light);
+
+const spawnLight = new THREE.SpotLight(0xa526ff, 30);
+spawnLight.position.set(0, 15, -2);                      
 spawnLight.target.position.set(0, 0, 0);          
 spawnLight.angle = Math.PI / 5;                     
 spawnLight.penumbra = 0.6;                        
@@ -50,7 +50,7 @@ spawnLight.shadow.normalBias = 0.02;
 scene.add(spawnLight);
 scene.add(spawnLight.target);
 
-const dLightHelper1 = new THREE.DirectionalLightHelper(spawnLight);
+const dLightHelper1 = new THREE.SpotLightHelper(spawnLight);
 scene.add(dLightHelper1);
 
 spawnLight.castShadow = true;
@@ -58,7 +58,8 @@ spawnLight.shadow.mapSize.set(2048, 2048);
 spawnLight.shadow.camera.near = 1;
 spawnLight.shadow.camera.far = 30;
 
-const sceneDirectionalLight = new THREE.DirectionalLight(0x834ca6, 1);
+
+/*const sceneDirectionalLight = new THREE.DirectionalLight(0x834ca6, 1);
 sceneDirectionalLight.position.set(0, 10, 0);
 scene.add(sceneDirectionalLight);
 
@@ -77,7 +78,7 @@ sceneDirectionalLight.shadow.camera.far = 50;
 sceneDirectionalLight.shadow.camera.updateProjectionMatrix();
 
 const dLightHelper2 = new THREE.DirectionalLightHelper(sceneDirectionalLight);
-scene.add(dLightHelper2);
+scene.add(dLightHelper2);*/
 
 
 // 3D MODELS ----
@@ -87,10 +88,18 @@ const TwoTimemodel = TwoTime.scene;
 
 scene.add(TwoTimemodel);
 TwoTimemodel.position.set(0, 0.35, 1); // <- ORIGINAL POSITION
-//TwoTimemodel.position.set(-12, 0.35, 9); // < - POSITION FOR TESTING
 TwoTimemodel.rotation.y = Math.PI / 2;
 TwoTimemodel.traverse(o => { if (o.isMesh) o.castShadow = true; });
 TwoTimemodel.scale.set(12, 12, 12);
+
+const Azure = await loader.loadAsync('assets/AzureModel/scene.gltf');
+const Azuremodel = Azure.scene;
+
+scene.add(Azuremodel);
+Azuremodel.position.set(2, 0, 1); // <- ORIGINAL POSITION
+Azuremodel.rotation.y = Math.PI / 2;
+Azuremodel.traverse(o => { if (o.isMesh) o.castShadow = true; });
+Azuremodel.scale.set(0.15, 0.15, 0.15);
 
 
 // UNIVERSAL MATERIALS ----
@@ -218,7 +227,7 @@ const lampFrameMat = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide
 });
 
-const lampLightMat = new THREE.MeshBasicMaterial({color: 0xa6e9ff});
+const lampLightMat = new THREE.MeshBasicMaterial({color: 0xc8a6ff});
 
 function createLamp({width = 0.2, height = 0.25, postWidth = 0.05} = {}) {
   const lamp = new THREE.Group();
@@ -258,7 +267,7 @@ function createLamp({width = 0.2, height = 0.25, postWidth = 0.05} = {}) {
   light.position.y = capH + height / 2;
   lamp.add(light);
 
-  const pointLight = new THREE.PointLight(0xa6e9ff, 1, 3, 2);
+  const pointLight = new THREE.PointLight(0xdba6ff, 1, 3, 2);
   pointLight.position.copy(light.position);
   lamp.add(pointLight);
 
@@ -267,7 +276,7 @@ function createLamp({width = 0.2, height = 0.25, postWidth = 0.05} = {}) {
   return lamp;
 }
 
-function createStandLamp({light = true, lightColor = 0xa6e9ff, baseMat = graniteDarkMat} = {}) {
+function createStandLamp({light = true, lightColor = 0xdba6ff, baseMat = graniteDarkMat} = {}) {
   const lamp = new THREE.Group();
 
   const bottom = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.2, 0.6), baseMat);
