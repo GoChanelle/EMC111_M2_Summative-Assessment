@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { setupLights } from './lightsneffects.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -28,57 +29,7 @@ scene.background = cubeTextureLoader.load(
 );
 
 // -------------------------------------------------------
-renderer.shadowMap.enabled = true;
-
-const sceneAmbientLight = new THREE.AmbientLight(0x4a0073, 0.9);
-scene.add(sceneAmbientLight);
-
-const light = new THREE.HemisphereLight(0x8313eb, 0x250061, 0.8);
-scene.add(light);
-
-const spawnLight = new THREE.SpotLight(0xa526ff, 30);
-spawnLight.position.set(0, 15, -2);                      
-spawnLight.target.position.set(0, 0, 0);          
-spawnLight.angle = Math.PI / 5;                     
-spawnLight.penumbra = 0.6;                        
-spawnLight.decay = 1.5;                             
-spawnLight.distance = 40;       
-
-spawnLight.shadow.bias = -0.0005;
-spawnLight.shadow.normalBias = 0.02;
-
-scene.add(spawnLight);
-scene.add(spawnLight.target);
-
-const dLightHelper1 = new THREE.SpotLightHelper(spawnLight);
-scene.add(dLightHelper1);
-
-spawnLight.castShadow = true;
-spawnLight.shadow.mapSize.set(2048, 2048);
-spawnLight.shadow.camera.near = 1;
-spawnLight.shadow.camera.far = 30;
-
-
-/*const sceneDirectionalLight = new THREE.DirectionalLight(0x834ca6, 1);
-sceneDirectionalLight.position.set(0, 10, 0);
-scene.add(sceneDirectionalLight);
-
-sceneDirectionalLight.castShadow = true;
-
-sceneDirectionalLight.shadow.mapSize.set(2048, 2048);
-sceneDirectionalLight.shadow.bias = -0.0005;
-sceneDirectionalLight.shadow.normalBias = 0.03; 
-
-sceneDirectionalLight.shadow.camera.left = -20;
-sceneDirectionalLight.shadow.camera.right = 20;
-sceneDirectionalLight.shadow.camera.top = 20;
-sceneDirectionalLight.shadow.camera.bottom = -20;
-sceneDirectionalLight.shadow.camera.near = 0.5;
-sceneDirectionalLight.shadow.camera.far = 50;
-sceneDirectionalLight.shadow.camera.updateProjectionMatrix();
-
-const dLightHelper2 = new THREE.DirectionalLightHelper(sceneDirectionalLight);
-scene.add(dLightHelper2);*/
+const lights = setupLights(scene, renderer);
 
 
 // 3D MODELS ----
@@ -96,7 +47,7 @@ const Azure = await loader.loadAsync('assets/AzureModel/scene.gltf');
 const Azuremodel = Azure.scene;
 
 scene.add(Azuremodel);
-Azuremodel.position.set(2, 0, 1); // <- ORIGINAL POSITION
+Azuremodel.position.set(0, 0, 1); // <- ORIGINAL POSITION
 Azuremodel.rotation.y = Math.PI / 2;
 Azuremodel.traverse(o => { if (o.isMesh) o.castShadow = true; });
 Azuremodel.scale.set(0.15, 0.15, 0.15);
@@ -146,6 +97,18 @@ const mapGround = new THREE.Mesh(mapGroundGeo, mapGroundMat);
 mapGround.position.set(0, -0.5, 0);
 mapGround.receiveShadow = true;
 scene.add(mapGround);
+
+const TheSpawnGeo = new THREE.PlaneGeometry(10, 10);
+const TheSpawnMat = new THREE.MeshBasicMaterial({
+  map: textureLoader.load('assets/textures/TheSpawn.png'), 
+  transparent: true,
+  alphaTest: 0.5,
+  side: THREE.DoubleSide
+});
+const TheSpawn = new THREE.Mesh(TheSpawnGeo, TheSpawnMat);
+TheSpawn.position.set(0, 15, -2);
+TheSpawn.rotation.x = Math.PI / 2.5;
+scene.add(TheSpawn);
 
 
 // FENCE ----
@@ -1699,9 +1662,43 @@ path2.receiveShadow = true;
 
 scene.add(path1, path2);
 
+// ANIMATE ----
+const walkRadius = 2;      
+const walkSpeed = 0.5;        
+const followGap = 1;       
+const walkCenter = new THREE.Vector3(0, 0, 0); 
+const twoTimeFacing = 0;
+const azureFacing = Math.PI;  
+const clock = new THREE.Clock();
+const modelFacingOffset = 0;
+
+function placeOnCircle(model, angle, y) {
+  model.position.set(
+    walkCenter.x + Math.cos(angle) * walkRadius,
+    y,
+    walkCenter.z + Math.sin(angle) * walkRadius
+  );
+
+  model.rotation.y = -angle + (walkSpeed > 0 ? 0 : Math.PI) + modelFacingOffset;
+}
+
 function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+
+  TheSpawn.rotation.z += 0.03;
+
+  const t = clock.getElapsedTime();
+  const angle = t * walkSpeed;
+
+  placeOnCircle(TwoTimemodel, angle, 0.35);
+  placeOnCircle(Azuremodel, angle - followGap * Math.sign(walkSpeed), 0);
+
+  TwoTimemodel.rotation.y = -angle + twoTimeFacing;
+  Azuremodel.rotation.y = -(angle - followGap * Math.sign(walkSpeed)) + azureFacing;
+
+  TheSpawn.rotation.z += 0.02;
+  renderer.render(scene, camera);
 
 }
 animate();
