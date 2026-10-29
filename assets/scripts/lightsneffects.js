@@ -66,9 +66,9 @@ export function particles(scene) {
 
     let sprite = new THREE.TextureLoader().load("assets/textures/star.png");
     let starMaterial = new THREE.PointsMaterial({
-        color: 0xb6c8ff,
+        color: 0xd4deff,
         sizeAttenuation: false,
-        size: 2.5,
+        size: 3,
         map: sprite,
     });
 
