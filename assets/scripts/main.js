@@ -1717,7 +1717,6 @@ function animate() {
   TheSpawnGlow.rotation.z -= 0.02;
 
   stars.rotation.y += 0.002;
-  //scene.backgroundRotation.y -= 0.002;
 
   renderer.render(scene, camera);
 
