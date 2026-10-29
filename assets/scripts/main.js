@@ -34,6 +34,17 @@ const stars = particles(scene);
 
 scene.fog = new THREE.Fog(0x2c136b, 4, 15);
 
+const listener = new THREE.AudioListener();
+camera.add(listener);
+const sound = new THREE.Audio(listener);
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('assets/audio/AndTheSeraphimWept.mp3', function(buffer) {
+	sound.setBuffer(buffer);
+	sound.setLoop(true);
+	sound.setVolume(0.5);
+	sound.play();
+});
+
 // 3D MODELS ----
 const loader = new GLTFLoader();
 const TwoTime = await loader.loadAsync('assets/2TimeModel/scene.gltf');
