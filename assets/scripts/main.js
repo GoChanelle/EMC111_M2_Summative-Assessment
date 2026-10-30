@@ -14,6 +14,15 @@ const controls = new OrbitControls(camera, renderer.domElement);
 camera.position.set(0, 1, 3);
 controls.update();
 
+controls.keys = {
+  UP: 'KeyW',
+  LEFT: 'KeyA',
+  BOTTOM: 'KeyS',
+  RIGHT: 'KeyD',
+}
+controls.listenToKeyEvents(window);
+controls.keyPanSpeed = 20;
+
 const textureLoader = new THREE.TextureLoader();
 
 const cubeTextureLoader = new THREE.CubeTextureLoader();
